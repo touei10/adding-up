@@ -1,6 +1,6 @@
 /**
- * 「2010 年から 2015 年にかけて 15〜19 歳の人が減った割合の都道府県ランキング」
- * 
+ * 「2010 年から 2015 年にかけて 10〜19 歳の人が増えた割合の都道府県ランキング」
+ *  ==  lecture.  practice.  ◎application.  ==
  */
 
 'use strict';
@@ -16,22 +16,24 @@ rl.on('line', (lineString) => {
     const columns = lineString.split(',');
     const year = parseInt(columns[0]);
     const prefectures = columns[1];
-    const popu = parseInt(columns[3]);
+    const popuU14 = parseInt(columns[2]);
+    const popuU19 = parseInt(columns[3]);
+    const popu = popuU14 + popuU19;
 
     if (year === 2010 || year === 2015) {
         let value = prefecturesDataMap.get(prefectures);
         if (!value) {
             value = {
-                popu10: 0,
-                popu15: 0,
+                popuY10: 0,
+                popuY15: 0,
                 change: null
             };
         }
         if (year === 2010) {
-            value.popu10 = popu;
+            value.popuY10 = popu;
         }
         if (year === 2015) {
-            value.popu15 = popu;
+            value.popuY15 = popu;
         }
         prefecturesDataMap.set(prefectures, value);
     }
@@ -39,13 +41,13 @@ rl.on('line', (lineString) => {
 });
 rl.on('close', () => {
     for (let [key, value] of prefecturesDataMap) {
-        value.change = value.popu15 / value.popu10;
+        value.change = value.popuY15 / value.popuY10;
     }
     const rankingArray = Array.from(prefecturesDataMap).sort((pair1, pair2) => {
-        return pair1[1].change - pair2[1].change;
+        return pair2[1].change - pair1[1].change;
     });
     const rankingString = rankingArray.map(([key, value],  i) => {
-        return "第" + (i+1) + "位. " + key + ': ' + value.popu10 + '=>' + value.popu15 + '変化率:' + value.change;
+        return "第" + (i+1) + "位. " + key + ': ' + value.popuY10 + '=>' + value.popuY15 + '  変化率:' + value.change;
     });
     console.log(rankingString);
 });
